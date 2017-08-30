@@ -1,18 +1,17 @@
 {
-  "driver":  "mongodb",
+  "driver":  "redis",
   "params":  {
     "host": "localhost",
-    "port": "27017",
-    "dbname": "pumpio"
+    "port": "6379",
+    "database": 4
   },
   "hostname":  "localhost",
-  "secret":  "my dog has fleas",
+  "secret":  "qwelkjasdfkjsadlf",
   "noweb":  false,
   "port":  8000,
   "nologger":  false,
-  "serverUser":  "jsyang",
-  "datadir": "/home/jsyang/pump.io",
+  "serverUser":  "ubuntu",
+  "datadir": "/opt/pumpio-data",
   "enableUploads": true,
-  "debugClient": false,
-  "firehose": "ofirehose.com"
+  "debugClient": false
 }
