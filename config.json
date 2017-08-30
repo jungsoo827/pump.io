@@ -5,7 +5,7 @@
     "port": 6379,
     "database": 4
   },
-  "hostname":  "localhost",
+  "hostname":  "",
   "secret":  "qwelkjasdfkjsadlf",
   "noweb":  false,
   "port":  28181,
