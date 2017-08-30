@@ -1,0 +1,18 @@
+{
+  "driver":  "mongodb",
+  "params":  {
+    "host": "localhost",
+    "port": "27017",
+    "dbname": "pumpio"
+  },
+  "hostname":  "localhost",
+  "secret":  "my dog has fleas",
+  "noweb":  false,
+  "port":  8000,
+  "nologger":  false,
+  "serverUser":  "jsyang",
+  "datadir": "/home/jsyang/pump.io",
+  "enableUploads": true,
+  "debugClient": false,
+  "firehose": "ofirehose.com"
+}

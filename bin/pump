@@ -89,6 +89,8 @@ var cluster = require("cluster"),
 
 var main = function() {
     var config = argv;
+    // var config = argv;
+    var config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
     launchApps(config);
 };
 
