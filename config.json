@@ -2,13 +2,13 @@
   "driver":  "redis",
   "params":  {
     "host": "localhost",
-    "port": "6379",
+    "port": 6379,
     "database": 4
   },
   "hostname":  "localhost",
   "secret":  "qwelkjasdfkjsadlf",
   "noweb":  false,
-  "port":  8000,
+  "port":  28181,
   "nologger":  false,
   "serverUser":  "ubuntu",
   "datadir": "/opt/pumpio-data",
