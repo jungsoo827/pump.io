@@ -1,0 +1,17 @@
+{
+  "driver":  "redis",
+  "params":  {
+    "host": "localhost",
+    "port": 6379,
+    "database": 4
+  },
+  "hostname":  "",
+  "secret":  "qwelkjasdfkjsadlf",
+  "noweb":  false,
+  "port":  28181,
+  "nologger":  false,
+  "serverUser":  "ubuntu",
+  "datadir": "/opt/pumpio-data",
+  "enableUploads": true,
+  "debugClient": false
+}

@@ -95,8 +95,10 @@ if (majorRelease < 4 && cluster.isMaster) {
 // Then we get config files and launch some cluster apps
 
 var main = function() {
-    var config = argv;
-    launchApps(config);
+  // var config = argv;
+  var config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "config.json")));
+
+  launchApps(config);
 };
 
 // Launch apps
