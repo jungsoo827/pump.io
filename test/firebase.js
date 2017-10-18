@@ -12,15 +12,17 @@ var db = Databank.get(config.driver, config.params);
 db.connect({}, function(){
   DatabankObject.bank = db;
 
-  firebase.createChat('js5', 'title1', ['js4', 'js6']).then(function (chatId) {
+  firebase.createChat('js5', 'title1', ['js4', 'js8']).then(function (chatId) {
     console.log(chatId);
     let now = new Date();
     firebase.addChatMessage(chatId, 'js4', now.toISOString(), 'test message').then(function (chatMessageId) {
       // process.exit(0);
       let now2 = new Date();
-      firebase.addChatMessage(chatId, 'js6', now2.toISOString(), 'test message 2').then(function (chatMessageId) {
+      firebase.addChatMessage(chatId, 'js8', now2.toISOString(), 'test message 2').then(function (chatMessageId) {
         firebase.getChatListByUserId('js5').then(function (data) {
-          console.log(data)
+          console.log(data);
+          console.log(data[0].member_list);
+          console.log(data[0].message_list);
         });
       });
     })
