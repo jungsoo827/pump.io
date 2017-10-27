@@ -5,7 +5,16 @@
     "port": 6379,
     "database": 4
   },
-  "hostname":  "",
+  "hostname":  "127.0.0.1",
+  "smtphost":  "rimbol.com",
+  "smtpuser":  "jungsoo@rimbol.com",
+  "smtpfrom":  "jungsoo@rimbol.com",
+  "smtppass":  "11112222!",
+  "smtpserver":  "smtp.gmail.com",
+  "smtpport":  "465",
+  "smtpusessl":  true,
+  "smtpusetls":  false,
+  "smtptimeout":  30000,
   "secret":  "qwelkjasdfkjsadlf",
   "noweb":  false,
   "port":  28181,
@@ -13,5 +22,6 @@
   "serverUser":  "ubuntu",
   "datadir": "/opt/pumpio-data",
   "enableUploads": true,
-  "debugClient": false
+  "debugClient": false,
+  "firehose": "ofirehose.com"
 }
