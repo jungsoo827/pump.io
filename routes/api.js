@@ -55,6 +55,7 @@ var databank = require("databank"),
   mm = require("../lib/mimemap"),
   saveUpload = require("../lib/saveupload").saveUpload,
   streams = require("../lib/streams"),
+  clientreg = require("./clientreg"),
   reqUser = mw.reqUser,
   reqGenerator = mw.reqGenerator,
   sameUser = mw.sameUser,
@@ -89,6 +90,9 @@ var databank = require("databank"),
 var addRoutes = function (app, session) {
 
   var smw = (session) ? [session] : [];
+
+  app.post("/api/login", smw, login);
+  app.post("/api/register", smw, register);
 
   // Proxy to a remote server
 
@@ -477,6 +481,84 @@ var getUser = function (req, res, next) {
       }
       req.user.sanitize();
       res.json(req.user);
+    }
+  );
+};
+
+
+
+var register = function (req, res, next) {
+
+  if (req.body && req.body.user_id){
+    req.body.nickname = req.body.user_id
+  }
+  Step(
+    function() {
+      clientreg.getClient(this);
+    },
+    function(err, result) {
+      if (err) throw err;
+      if (!result) {
+        throw new HTTPError("Failed to get auth client", 401);
+      }
+      req.client = result;
+      reqGenerator(req, res, this);
+    },
+    function(err, pair) {
+      if (err) throw err;
+      createUser(req, res, next);
+    }
+  );
+};
+
+
+var login = function (req, res, next) {
+
+  var loginData = req.body;
+
+  var user = null;
+
+  Step(
+    function() {
+      clientreg.getClient(this);
+    },
+    function(err, result) {
+      if (err) throw err;
+      if (!result) {
+        throw new HTTPError("Failed to get auth client", 401);
+      }
+      req.client = result;
+      User.checkCredentials(loginData.user_id, loginData.password, this);
+    },
+    function(err, result) {
+      if (err) throw err;
+      if (!result) {
+        throw new HTTPError("Incorrect username or password", 401);
+      }
+      user = result;
+      setPrincipal(req.session, user.profile, this);
+    },
+    function(err) {
+      if (err) throw err;
+      user.expand(this);
+    },
+    function(err) {
+      if (err) throw err;
+      user.profile.expandFeeds(this);
+    },
+    function(err) {
+      if (err) throw err;
+      req.app.provider.newTokenPair(req.client, user, this);
+    },
+    function(err, pair) {
+      if (err) {
+        next(err);
+      } else {
+        user.sanitize();
+        user.token = pair.access_token;
+        user.secret = pair.token_secret;
+        res.json(user);
+      }
     }
   );
 };
@@ -883,7 +965,18 @@ var createUser = function (req, res, next) {
     }
   }
 
-  props.name = 'name ' + props.nickname;
+  if (!_.has(props, "name") ||
+    !_.isString(props.name) ||
+    props.name.length === 0) {
+    next(new HTTPError("No name", 400));
+    return;
+  } else {
+    if (props.name.length > 100) {
+      next(new HTTPError("Name is too long ( max is 100 ).", 400));
+      return;
+    }
+  }
+
   Step(
     function () {
       User.create(props, this);

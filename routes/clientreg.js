@@ -168,4 +168,16 @@ var clientReg = function(req, res, next) {
     }
 };
 
+var getClient = function(callback) {
+
+    Client.create({}, function(err, client) {
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, client);
+      }
+    });
+};
+
 exports.addRoutes = addRoutes;
+exports.getClient = getClient;
