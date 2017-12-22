@@ -51,3 +51,5 @@ jspm_packages
 config.js
 
 public/template/*.jade.js
+.idea/
+pump.io.iml
