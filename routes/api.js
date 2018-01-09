@@ -68,6 +68,7 @@ var databank = require("databank"),
   userReadAuth = authc.userReadAuth,
   anyReadAuth = authc.anyReadAuth,
   setPrincipal = authc.setPrincipal,
+  requireLogin = authc.requireLogin,
   fileContent = mw.fileContent,
   requestObject = omw.requestObject,
   requestObjectByID = omw.requestObjectByID,
@@ -91,8 +92,8 @@ var addRoutes = function (app, session) {
 
   var smw = (session) ? [session] : [];
 
-  app.post("/api/login", smw, login);
-  app.post("/api/register", smw, register);
+  app.post("/api/login", smw, requireLogin, login);
+  app.post("/api/register", smw, requireLogin, register);
 
   // Proxy to a remote server
 
@@ -104,14 +105,14 @@ var addRoutes = function (app, session) {
   app.delete("/api/user/:nickname", userWriteOAuth, reqUser, sameUser, delUser);
 
   // Chats
-  app.get("/api/chats", smw, anyReadAuth, getChatList);
-  // app.put("/api/chats/:chat_id", anyReadAuth, updateChat);
-  app.delete("/api/chats/:chat_id", smw, anyReadAuth, deleteChat);
-  app.post("/api/chats", smw, anyReadAuth, createChat);
-  app.post("/api/chats/:chat_id/messages", smw, anyReadAuth, addChatMessage);
-  app.get("/api/chats/:chat_id/members", smw, anyReadAuth, getChatMemberList);
-  app.delete("/api/chats/:chat_id/members", smw, anyReadAuth, deleteChatMembers);
-  app.post("/api/chats/:chat_id/members", smw, anyReadAuth, addChatMembers);
+  app.get("/api/chats", smw, requireLogin, getChatList);
+  // app.put("/api/chats/:chat_id", smw, requireLogin, updateChat);
+  app.delete("/api/chats/:chat_id", smw, requireLogin, deleteChat);
+  app.post("/api/chats", smw, requireLogin, createChat);
+  app.post("/api/chats/:chat_id/messages", smw, requireLogin, addChatMessage);
+  app.get("/api/chats/:chat_id/members", smw, requireLogin, getChatMemberList);
+  app.delete("/api/chats/:chat_id/members", smw, requireLogin, deleteChatMembers);
+  app.post("/api/chats/:chat_id/members", smw, requireLogin, addChatMembers);
 
   app.get("/api/user/:nickname/profile", smw, anyReadAuth, reqUser, personType, getObject);
   app.put("/api/user/:nickname/profile", userWriteOAuth, reqUser, sameUser, personType, reqGenerator, putObject);
@@ -557,7 +558,15 @@ var login = function (req, res, next) {
         user.sanitize();
         user.token = pair.access_token;
         user.secret = pair.token_secret;
-        res.json(user);
+        authc.saveUser(req, user);
+        res.json({
+          user_id: user.user_id,
+          email: user.email,
+          name: user.name,
+          nickname: user.nickname,
+          updated: user.updated,
+          // profile: user.profile
+        });
       }
     }
   );
@@ -605,7 +614,7 @@ var delUser = function (req, res, next) {
 
 let getChatList = function (req, res, next) {
 
-  let user_id = req.principalUser.nickname;
+  let user_id = authc.getUser(req).user_id;
 
   Firebase.getChatListByUserId(user_id).then(function (chatList) {
     res.json(chatList);
@@ -617,7 +626,7 @@ let getChatList = function (req, res, next) {
 
 let deleteChat = function (req, res, next) {
 
-  let user_id = req.principalUser.nickname;
+  let user_id = authc.getUser(req).user_id;
   let chat_id = req.params.chat_id;
 
   Firebase.removeChat(user_id, chat_id).then(function () {
@@ -630,7 +639,7 @@ let deleteChat = function (req, res, next) {
 
 let createChat = function (req, res, next) {
 
-  let user_id = req.principalUser.nickname;
+  let user_id = authc.getUser(req).user_id;
   let title = req.body.title;
   let member_id_list = req.body.member_id_list;
 
@@ -647,7 +656,7 @@ let createChat = function (req, res, next) {
 
 let addChatMessage = function (req, res, next) {
 
-  let user_id = req.principalUser.nickname;
+  let user_id = authc.getUser(req).user_id;
   let chat_id = req.params.chat_id;
   let message = req.body.message;
   let now = new Date();
@@ -664,7 +673,7 @@ let addChatMessage = function (req, res, next) {
 
 let getChatMemberList = function (req, res, next) {
 
-  let user_id = req.principalUser.nickname;
+  let user_id = authc.getUser(req).user_id;
   let chat_id = req.params.chat_id;
 
   Firebase.getChatMembers(chat_id).then(function (memberList) {
@@ -676,7 +685,7 @@ let getChatMemberList = function (req, res, next) {
 
 let deleteChatMembers = function (req, res, next) {
 
-  let user_id = req.principalUser.nickname;
+  let user_id = authc.getUser(req).user_id;
   let chat_id = req.params.chat_id;
   let user_id_list = req.body.user_id_list;
 
@@ -693,7 +702,7 @@ let deleteChatMembers = function (req, res, next) {
 
 let addChatMembers = function (req, res, next) {
 
-  let user_id = req.principalUser.nickname;
+  let user_id = authc.getUser(req).user_id;
   let chat_id = req.params.chat_id;
   let user_id_list = req.body.user_id_list;
 
